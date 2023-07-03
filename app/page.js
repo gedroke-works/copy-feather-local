@@ -1,7 +1,48 @@
+"use client";
 import Image from "next/image";
 import logo from "/public/logo.svg";
+import { useFormik } from "formik";
 
 export default function Home() {
+  // A custom validation function. This must return an object
+  // which keys are symmetrical to our values/initialValues
+  const validate = (values) => {
+    const errors = {};
+    if (!values.firstName) {
+      errors.firstName = "Requis";
+    } else if (values.firstName.length > 15) {
+      errors.firstName = "Doit comporter 15 caractères ou moins";
+    }
+
+    if (!values.lastName) {
+      errors.lastName = "Requis";
+    } else if (values.lastName.length > 20) {
+      errors.lastName = "Doit comporter 20 caractères ou moins";
+    }
+
+    if (!values.email) {
+      errors.email = "Requis";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+    ) {
+      errors.email = "Adresse e-mail invalide";
+    }
+    return errors;
+  };
+  // Pass the useFormik() hook initial form values and a submit function that will
+  // be called when the form is submitted
+  const formik = useFormik({
+    initialValues: {
+      lastName: "",
+      firstName: "",
+      email: "",
+    },
+    validate,
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -19,7 +60,7 @@ export default function Home() {
         </div>
         {/* Form Section*/}
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <form onSubmit={formik.handleSubmit} className="space-y-6">
             {/* Name */}
             <div>
               <div className="flex items-center justify-between">
@@ -35,11 +76,19 @@ export default function Home() {
                   id="lastName"
                   name="lastName"
                   type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.lastName}
                   autoComplete="text"
                   placeholder="Entrez votre nom..."
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {formik.touched.lastName && formik.errors.lastName ? (
+                  <div className="text-xs text-gray-500 ml-2 mt-[-1]">
+                    {formik.errors.lastName}
+                  </div>
+                ) : null}
               </div>
             </div>
             <div>
@@ -56,11 +105,19 @@ export default function Home() {
                   id="firstName"
                   name="firstName"
                   type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.firstName}
                   autoComplete="text"
                   placeholder="Entrez votre prénom..."
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {formik.touched.firstName && formik.errors.firstName ? (
+                  <div className="text-xs text-gray-500 ml-2 mt-[-1]">
+                    {formik.errors.firstName}
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -77,11 +134,19 @@ export default function Home() {
                   id="email"
                   name="email"
                   type="email"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.email}
                   autoComplete="email"
                   placeholder="Entrez votre adresse email..."
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {formik.touched.email && formik.errors.email ? (
+                  <div className="text-xs text-gray-500 ml-2 mt-[-1]">
+                    {formik.errors.email}
+                  </div>
+                ) : null}
               </div>
             </div>
             {/* Submit */}
